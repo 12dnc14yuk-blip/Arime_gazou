@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>しゅりり ありがとう画像メーカー v5.1</title>
+<title>しゅりり ありがとう画像メーカー v5.4</title>
 <style>
   *{box-sizing:border-box}
   body{margin:0;background:#fff8ec;color:#5f3a1b;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif}
@@ -57,7 +57,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>🐰 しゅりり ありがとう画像メーカー v5.1</h1>
+  <h1>🐰 しゅりり ありがとう画像メーカー v5.4</h1>
   <p class="lead">iPhone永久保存版。追加した素材はこの端末に保存され、次回もそのまま使えます 📱✨</p>
   <div class="grid">
     <section class="card">
@@ -435,7 +435,7 @@ async function render(){
   if(text) ctx.drawImage(text,x,y,stage,stage);
 
   // Items are drawn over the main image. User-authored item PNGs should already be on the same 2048 canvas.
-  for(const idx of selected.item){
+  for(const idx of selected.item.slice(0,1)){
     if(!rootAssets.item.length) break;
     const im=await loadImage(rootAssets.item[idx%rootAssets.item.length]);
     ctx.drawImage(im,x,y,stage,stage);
@@ -481,10 +481,16 @@ function randomize(){
   if(document.getElementById('rBase').checked && rootAssets.base.length) selected.base=rnd(rootAssets.base.length);
   if(document.getElementById('rFace').checked && rootAssets.face.length) selected.face=rnd(rootAssets.face.length);
   if(document.getElementById('rText').checked && rootAssets.text.length) selected.text=rnd(rootAssets.text.length);
-  if(document.getElementById('rItem').checked && rootAssets.item.length){
-    const n=Math.min(rootAssets.item.length, 1+rnd(Math.min(3,rootAssets.item.length)));
-    selected.item=sample([...Array(rootAssets.item.length).keys()],n);
-  } else if(!rootAssets.item.length) selected.item=[];
+  if(document.getElementById('rItem').checked){
+    // 小物は毎回いったんリセットしてから、
+    // 50%で「なし」、50%で「1個だけ」にする
+    selected.item = [];
+    if(rootAssets.item.length && Math.random() < 0.5){
+      selected.item = [rnd(rootAssets.item.length)];
+    }
+  } else if(!rootAssets.item.length){
+    selected.item = [];
+  }
   if(document.getElementById('rEmoji').checked){
     const count=Number(document.getElementById('emojiCount').value)||0;
     selected.emojis=sample(emojiPool,count);
