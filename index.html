@@ -434,9 +434,9 @@ async function render(){
   if(face) ctx.drawImage(face,x,y,stage,stage);
   if(text) ctx.drawImage(text,x,y,stage,stage);
 
-  // Items are drawn over the main image. User-authored item PNGs should already be on the same 2048 canvas.
-  for(const idx of selected.item){
-    if(!rootAssets.item.length) break;
+  // Items are drawn over the main image. Show only one item at a time to avoid overlap.
+  if(selected.item?.length && rootAssets.item.length){
+    const idx=selected.item[0];
     const im=await loadImage(rootAssets.item[idx%rootAssets.item.length]);
     ctx.drawImage(im,x,y,stage,stage);
   }
@@ -482,8 +482,7 @@ function randomize(){
   if(document.getElementById('rFace').checked && rootAssets.face.length) selected.face=rnd(rootAssets.face.length);
   if(document.getElementById('rText').checked && rootAssets.text.length) selected.text=rnd(rootAssets.text.length);
   if(document.getElementById('rItem').checked && rootAssets.item.length){
-    const n=Math.min(rootAssets.item.length, 1+rnd(Math.min(3,rootAssets.item.length)));
-    selected.item=sample([...Array(rootAssets.item.length).keys()],n);
+    selected.item=sample([...Array(rootAssets.item.length).keys()],1);
   } else if(!rootAssets.item.length) selected.item=[];
   if(document.getElementById('rEmoji').checked){
     const count=Number(document.getElementById('emojiCount').value)||0;
